@@ -1,0 +1,178 @@
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { useApi } from "@/hooks/useApi";
+import DataTable, { Column } from "@/components/dashboard/DataTable";
+import StatusBadge from "@/components/dashboard/StatusBadge";
+import Pagination from "@/components/dashboard/Pagination";
+import Loader from "@/components/Loader";
+import type { Booking, Paged } from "@/types";
+import { CalendarDays, ExternalLink, Compass, ShieldCheck } from "lucide-react";
+
+export default function MyRentalsPage() {
+  const [page, setPage] = useState(1);
+  const { data, loading, error } = useApi<Paged<Booking>>(`/bookings/my?page=${page}&limit=8`);
+
+  const bookings = data?.items || [];
+  const totalPages = data?.totalPages || 1;
+
+  const columns: Column<Booking>[] = [
+    {
+      header: "Equipment",
+      render: (b) => (
+        <div className="flex items-center gap-3">
+          <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-muted border border-border shrink-0">
+            {b.equipmentImage ? (
+              <Image
+                src={b.equipmentImage}
+                alt={b.equipmentName}
+                fill
+                className="object-cover"
+                sizes="48px"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs font-bold">
+                GEAR
+              </div>
+            )}
+          </div>
+          <div>
+            <Link
+              href={`/equipment/${b.equipmentId}`}
+              className="font-bold text-foreground hover:text-amber-600 transition-colors line-clamp-1 inline-flex items-center gap-1 group"
+            >
+              <span>{b.equipmentName}</span>
+              <ExternalLink className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+            </Link>
+            <p className="text-xs text-muted-foreground">Owner: {b.ownerName || b.ownerEmail}</p>
+          </div>
+        </div>
+      ),
+    },
+    {
+      header: "Rental Window",
+      render: (b) => {
+        const start = new Date(b.startDate).toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        });
+        const end = new Date(b.endDate).toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        });
+        const d1 = new Date(b.startDate).getTime();
+        const d2 = new Date(b.endDate).getTime();
+        const days = Math.max(1, Math.round((d2 - d1) / (1000 * 60 * 60 * 24)) + 1);
+
+        return (
+          <div className="space-y-0.5">
+            <p className="text-xs font-semibold text-foreground">
+              {start} → {end}
+            </p>
+            <span className="text-[11px] font-medium text-amber-700 dark:text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-md inline-block">
+              {days} {days === 1 ? "day" : "days"} (Qty: {b.quantity})
+            </span>
+          </div>
+        );
+      },
+    },
+    {
+      header: "Total Cost",
+      render: (b) => (
+        <span className="font-extrabold text-foreground text-sm font-mono">
+          ${Number(b.totalAmount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+        </span>
+      ),
+    },
+    {
+      header: "Payment",
+      render: (b) => <StatusBadge status={b.paymentStatus} />,
+    },
+    {
+      header: "Rental Status",
+      render: (b) => <StatusBadge status={b.bookingStatus} />,
+    },
+    {
+      header: "Booked On",
+      render: (b) => (
+        <span className="text-xs text-muted-foreground whitespace-nowrap">
+          {new Date(b.createdAt).toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+          })}
+        </span>
+      ),
+    },
+    {
+      header: "Action",
+      className: "text-right",
+      render: (b) => (
+        <div className="text-right">
+          <Link
+            href={`/equipment/${b.equipmentId}`}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border border-border bg-card hover:bg-muted text-foreground transition-colors cursor-pointer"
+          >
+            <span>Details</span>
+            <ExternalLink className="w-3 h-3" />
+          </Link>
+        </div>
+      ),
+    },
+  ];
+
+  return (
+    <div className="space-y-6">
+      {/* Header Banner */}
+      <div className="warm-card p-6 rounded-3xl border border-border flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2 text-amber-600 font-bold text-xs uppercase tracking-wider mb-1">
+            <CalendarDays className="w-4 h-4" />
+            <span>Customer Dashboard</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-foreground">
+            My Equipment Rentals
+          </h1>
+          <p className="text-xs sm:text-sm text-muted-foreground mt-1">
+            Track active reservations, duration schedules, and completed rental history.
+          </p>
+        </div>
+
+        <Link
+          href="/equipment"
+          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-primary-foreground text-xs font-bold shadow-md hover:bg-primary/90 transition-all cursor-pointer self-start sm:self-auto shrink-0"
+        >
+          <Compass className="w-4 h-4" />
+          <span>Rent More Gear</span>
+        </Link>
+      </div>
+
+      {/* Main Content */}
+      {loading ? (
+        <Loader message="Loading your rental history..." />
+      ) : error ? (
+        <div className="warm-card p-8 text-center rounded-2xl text-rose-600 border border-rose-500/20">
+          <p className="font-semibold text-sm">Failed to load rentals: {error}</p>
+        </div>
+      ) : (
+        <>
+          <DataTable
+            columns={columns}
+            rows={bookings}
+            emptyMessage="You have not rented any equipment yet."
+          />
+
+          <Pagination
+            page={page}
+            totalPages={totalPages}
+            onChange={(newPage) => setPage(newPage)}
+          />
+        </>
+      )}
+    </div>
+  );
+}
