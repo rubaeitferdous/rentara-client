@@ -3,20 +3,61 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import Swal from "sweetalert2";
+import toast from "react-hot-toast";
+import { api } from "@/lib/api";
 import { useApi } from "@/hooks/useApi";
 import DataTable, { Column } from "@/components/dashboard/DataTable";
 import StatusBadge from "@/components/dashboard/StatusBadge";
 import Pagination from "@/components/dashboard/Pagination";
+import InvoiceModal from "@/components/dashboard/InvoiceModal";
 import Loader from "@/components/Loader";
 import type { Booking, Paged } from "@/types";
-import { Layers, MapPin, Phone, Mail, ExternalLink } from "lucide-react";
+import {
+  Layers,
+  MapPin,
+  Phone,
+  Mail,
+  ExternalLink,
+  Receipt,
+  CheckCircle2,
+} from "lucide-react";
 
 export default function OwnerRentalsPage() {
   const [page, setPage] = useState(1);
-  const { data, loading, error } = useApi<Paged<Booking>>(`/bookings/owner?page=${page}&limit=10`);
+  const { data, loading, error, reload } = useApi<Paged<Booking>>(
+    `/bookings/owner?page=${page}&limit=10`
+  );
+  const [selectedInvoice, setSelectedInvoice] = useState<Booking | null>(null);
 
   const bookings = data?.items || [];
   const totalPages = data?.totalPages || 1;
+
+  const handleCompleteOrder = async (booking: Booking) => {
+    const result = await Swal.fire({
+      title: "Mark Rental as Completed?",
+      text: `Confirm that equipment "${booking.equipmentName}" has been safely returned by ${booking.customerName}?`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#10b981",
+      cancelButtonColor: "#6b7280",
+      confirmButtonText: "Yes, Mark Completed",
+      cancelButtonText: "Not Yet",
+      background: "var(--card)",
+      color: "var(--foreground)",
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      await api(`/bookings/${booking._id}/complete`, { method: "PATCH" });
+      toast.success("Order marked as completed!");
+      reload();
+    } catch (err: any) {
+      console.error("Order completion error:", err);
+      toast.error(err.message || "Failed to mark order completed.");
+    }
+  };
 
   const columns: Column<Booking>[] = [
     {
@@ -46,7 +87,7 @@ export default function OwnerRentalsPage() {
               <span>{b.equipmentName}</span>
               <ExternalLink className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
             </Link>
-            <p className="text-xs text-muted-foreground">Order ID: {b._id.slice(-6).toUpperCase()}</p>
+            <p className="text-xs text-muted-foreground">Order ID: #{b._id.slice(-6).toUpperCase()}</p>
           </div>
         </div>
       ),
@@ -109,6 +150,35 @@ export default function OwnerRentalsPage() {
       header: "Order Status",
       render: (b) => <StatusBadge status={b.bookingStatus} />,
     },
+    {
+      header: "Actions",
+      className: "text-right",
+      render: (b) => (
+        <div className="flex items-center justify-end gap-1.5">
+          <button
+            type="button"
+            onClick={() => setSelectedInvoice(b)}
+            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold border border-border bg-card hover:bg-muted text-foreground transition-all cursor-pointer shadow-xs"
+            title="View rental receipt"
+          >
+            <Receipt className="w-3.5 h-3.5 text-amber-600" />
+            <span>Receipt</span>
+          </button>
+
+          {b.bookingStatus === "confirmed" && (
+            <button
+              type="button"
+              onClick={() => handleCompleteOrder(b)}
+              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/20 border border-emerald-500/20 transition-all cursor-pointer"
+              title="Mark returned / completed"
+            >
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              <span>Complete</span>
+            </button>
+          )}
+        </div>
+      ),
+    },
   ];
 
   return (
@@ -151,6 +221,12 @@ export default function OwnerRentalsPage() {
           />
         </>
       )}
+
+      {/* Invoice / Receipt Modal */}
+      <InvoiceModal
+        booking={selectedInvoice}
+        onClose={() => setSelectedInvoice(null)}
+      />
     </div>
   );
 }

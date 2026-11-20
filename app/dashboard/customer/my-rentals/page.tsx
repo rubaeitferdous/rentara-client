@@ -3,20 +3,65 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import Swal from "sweetalert2";
+import toast from "react-hot-toast";
+import { api } from "@/lib/api";
 import { useApi } from "@/hooks/useApi";
 import DataTable, { Column } from "@/components/dashboard/DataTable";
 import StatusBadge from "@/components/dashboard/StatusBadge";
 import Pagination from "@/components/dashboard/Pagination";
+import InvoiceModal from "@/components/dashboard/InvoiceModal";
 import Loader from "@/components/Loader";
 import type { Booking, Paged } from "@/types";
-import { CalendarDays, ExternalLink, Compass, ShieldCheck } from "lucide-react";
+import {
+  CalendarDays,
+  ExternalLink,
+  Compass,
+  FileText,
+  Ban,
+  Receipt,
+} from "lucide-react";
 
 export default function MyRentalsPage() {
   const [page, setPage] = useState(1);
-  const { data, loading, error } = useApi<Paged<Booking>>(`/bookings/my?page=${page}&limit=8`);
+  const { data, loading, error, reload } = useApi<Paged<Booking>>(
+    `/bookings/my?page=${page}&limit=8`
+  );
+  const [selectedInvoice, setSelectedInvoice] = useState<Booking | null>(null);
 
   const bookings = data?.items || [];
   const totalPages = data?.totalPages || 1;
+
+  const handleCancelBooking = async (booking: Booking) => {
+    const result = await Swal.fire({
+      title: "Cancel Rental Reservation?",
+      text: `Are you sure you want to cancel your rental of "${booking.equipmentName}"?`,
+      icon: "warning",
+      input: "text",
+      inputPlaceholder: "Optional reason for cancellation...",
+      showCancelButton: true,
+      confirmButtonColor: "#dc2626",
+      cancelButtonColor: "#6b7280",
+      confirmButtonText: "Yes, Cancel Booking",
+      cancelButtonText: "Keep Active",
+      background: "var(--card)",
+      color: "var(--foreground)",
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      await api(`/bookings/${booking._id}/cancel`, {
+        method: "PATCH",
+        body: JSON.stringify({ reason: result.value || "Customer cancellation" }),
+      });
+      toast.success("Rental booking cancelled.");
+      reload();
+    } catch (err: any) {
+      console.error("Cancellation error:", err);
+      toast.error(err.message || "Failed to cancel booking.");
+    }
+  };
 
   const columns: Column<Booking>[] = [
     {
@@ -109,16 +154,38 @@ export default function MyRentalsPage() {
       ),
     },
     {
-      header: "Action",
+      header: "Actions",
       className: "text-right",
       render: (b) => (
-        <div className="text-right">
+        <div className="flex items-center justify-end gap-1.5">
+          <button
+            type="button"
+            onClick={() => setSelectedInvoice(b)}
+            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold border border-border bg-card hover:bg-muted text-foreground transition-all cursor-pointer shadow-xs"
+            title="View official receipt"
+          >
+            <Receipt className="w-3.5 h-3.5 text-amber-600" />
+            <span>Receipt</span>
+          </button>
+
+          {b.bookingStatus === "confirmed" && (
+            <button
+              type="button"
+              onClick={() => handleCancelBooking(b)}
+              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold text-rose-600 hover:bg-rose-500/10 border border-transparent hover:border-rose-500/20 transition-all cursor-pointer"
+              title="Cancel upcoming rental"
+            >
+              <Ban className="w-3.5 h-3.5" />
+              <span>Cancel</span>
+            </button>
+          )}
+
           <Link
             href={`/equipment/${b.equipmentId}`}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border border-border bg-card hover:bg-muted text-foreground transition-colors cursor-pointer"
+            className="p-1.5 rounded-lg border border-border bg-card hover:bg-muted text-foreground transition-colors cursor-pointer"
+            title="View public equipment listing"
           >
-            <span>Details</span>
-            <ExternalLink className="w-3 h-3" />
+            <ExternalLink className="w-3.5 h-3.5" />
           </Link>
         </div>
       ),
@@ -138,7 +205,7 @@ export default function MyRentalsPage() {
             My Equipment Rentals
           </h1>
           <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-            Track active reservations, duration schedules, and completed rental history.
+            Track active reservations, duration schedules, receipt invoices, and completed rental history.
           </p>
         </div>
 
@@ -173,6 +240,12 @@ export default function MyRentalsPage() {
           />
         </>
       )}
+
+      {/* Invoice / Receipt Modal */}
+      <InvoiceModal
+        booking={selectedInvoice}
+        onClose={() => setSelectedInvoice(null)}
+      />
     </div>
   );
 }

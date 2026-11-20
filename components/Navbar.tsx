@@ -161,7 +161,7 @@ export default function Navbar() {
                       </Link>
 
                       <Link
-                        href={`${dashboardHref}/profile`}
+                        href="/dashboard/profile"
                         onClick={() => setUserDropdownOpen(false)}
                         className="flex items-center gap-2 px-3 py-2 text-sm text-foreground hover:bg-amber-500/10 hover:text-amber-700 dark:hover:text-amber-300 rounded-lg transition-colors font-medium"
                       >
@@ -267,6 +267,15 @@ export default function Navbar() {
                 >
                   <LayoutDashboard className="w-4 h-4" />
                   Go to Dashboard
+                </Link>
+
+                <Link
+                  href="/dashboard/profile"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-border bg-card text-foreground font-semibold text-sm hover:bg-muted"
+                >
+                  <User className="w-4 h-4 text-amber-600" />
+                  My Profile
                 </Link>
 
                 <button

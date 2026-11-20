@@ -7,13 +7,17 @@ import { useApi } from "@/hooks/useApi";
 import DataTable, { Column } from "@/components/dashboard/DataTable";
 import StatusBadge from "@/components/dashboard/StatusBadge";
 import Pagination from "@/components/dashboard/Pagination";
+import InvoiceModal from "@/components/dashboard/InvoiceModal";
 import Loader from "@/components/Loader";
 import type { Booking, Paged } from "@/types";
-import { Layers, ArrowRight, ExternalLink } from "lucide-react";
+import { Layers, ArrowRight, ExternalLink, Receipt } from "lucide-react";
 
 export default function AdminRentalsPage() {
   const [page, setPage] = useState(1);
-  const { data, loading, error } = useApi<Paged<Booking>>(`/bookings/admin?page=${page}&limit=10`);
+  const { data, loading, error } = useApi<Paged<Booking>>(
+    `/bookings/admin?page=${page}&limit=10`
+  );
+  const [selectedInvoice, setSelectedInvoice] = useState<Booking | null>(null);
 
   const bookings = data?.items || [];
   const totalPages = data?.totalPages || 1;
@@ -116,6 +120,23 @@ export default function AdminRentalsPage() {
       header: "Rental Status",
       render: (b) => <StatusBadge status={b.bookingStatus} />,
     },
+    {
+      header: "Action",
+      className: "text-right",
+      render: (b) => (
+        <div className="text-right">
+          <button
+            type="button"
+            onClick={() => setSelectedInvoice(b)}
+            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold border border-border bg-card hover:bg-muted text-foreground transition-all cursor-pointer shadow-xs"
+            title="Inspect Official Receipt"
+          >
+            <Receipt className="w-3.5 h-3.5 text-amber-600" />
+            <span>Receipt</span>
+          </button>
+        </div>
+      ),
+    },
   ];
 
   return (
@@ -158,6 +179,12 @@ export default function AdminRentalsPage() {
           />
         </>
       )}
+
+      {/* Invoice / Receipt Modal */}
+      <InvoiceModal
+        booking={selectedInvoice}
+        onClose={() => setSelectedInvoice(null)}
+      />
     </div>
   );
 }

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { CATEGORIES } from "@/lib/constants";
+import { useApi } from "@/hooks/useApi";
 import {
   HardHat,
   Camera,
@@ -24,6 +25,11 @@ const ICON_MAP: Record<string, React.ElementType> = {
 };
 
 export default function CategoriesSection() {
+  const { data: stats } = useApi<Record<string, number>>(
+    "/equipment/categories/stats",
+    { requiresAuth: false, immediate: true }
+  );
+
   return (
     <section className="py-16 md:py-24 relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
@@ -57,6 +63,7 @@ export default function CategoriesSection() {
           {CATEGORIES.map((cat) => {
             const Icon = ICON_MAP[cat.icon] || HardHat;
             const categoryUrl = `/equipment?category=${encodeURIComponent(cat.name)}`;
+            const count = stats?.[cat.name];
 
             return (
               <motion.div
@@ -75,8 +82,8 @@ export default function CategoriesSection() {
                       <Icon className="w-6 h-6" />
                     </div>
 
-                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-muted text-muted-foreground">
-                      {cat.badge}
+                    <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20">
+                      {count !== undefined ? `${count} Unit${count === 1 ? "" : "s"}` : cat.badge}
                     </span>
                   </div>
 

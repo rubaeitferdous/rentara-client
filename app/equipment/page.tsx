@@ -37,6 +37,7 @@ function EquipmentCatalog() {
 
   // Local Interactive States
   const [search, setSearch] = useState(initialSearch);
+  const [debouncedSearch, setDebouncedSearch] = useState(initialSearch);
   const [category, setCategory] = useState(initialCategory);
   const [rentalType, setRentalType] = useState(initialRentalType);
   const [sort, setSort] = useState(initialSort);
@@ -69,13 +70,46 @@ function EquipmentCatalog() {
     [searchParams, router, pathname]
   );
 
+  // Synchronize URL parameters with local state on browser navigation / external link clicks
+  useEffect(() => {
+    const qSearch = searchParams.get("search") || "";
+    const qCat = searchParams.get("category") || "All";
+    const qRent = searchParams.get("rentalType") || "All";
+    const qSort = searchParams.get("sort") || "newest";
+    const qMin = searchParams.get("minPrice") || "";
+    const qMax = searchParams.get("maxPrice") || "";
+    const qAvail = searchParams.get("availability") || "all";
+    const qPage = parseInt(searchParams.get("page") || "1", 10);
+
+    setSearch(qSearch);
+    setDebouncedSearch(qSearch);
+    setCategory(qCat);
+    setRentalType(qRent);
+    setSort(qSort);
+    setMinPrice(qMin);
+    setMaxPrice(qMax);
+    setAvailability(qAvail);
+    setPage(qPage);
+  }, [searchParams]);
+
+  // Debounce search input to avoid request flooding
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+      if (search !== (searchParams.get("search") || "")) {
+        syncQuery({ search, page: 1 });
+      }
+    }, 350);
+    return () => clearTimeout(timer);
+  }, [search, searchParams, syncQuery]);
+
   // Fetch equipment with server-side filters & sorting
   const fetchEquipment = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
       const queryParams = new URLSearchParams();
-      if (search.trim()) queryParams.set("search", search.trim());
+      if (debouncedSearch.trim()) queryParams.set("search", debouncedSearch.trim());
       if (category && category !== "All") queryParams.set("category", category);
       if (rentalType && rentalType !== "All") queryParams.set("rentalType", rentalType);
       if (minPrice) queryParams.set("minPrice", minPrice);
@@ -93,7 +127,7 @@ function EquipmentCatalog() {
     } finally {
       setLoading(false);
     }
-  }, [search, category, rentalType, minPrice, maxPrice, availability, sort, page]);
+  }, [debouncedSearch, category, rentalType, minPrice, maxPrice, availability, sort, page]);
 
   useEffect(() => {
     fetchEquipment();

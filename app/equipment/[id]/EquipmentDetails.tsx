@@ -21,6 +21,7 @@ import {
   User,
   Sparkles,
   Info,
+  Mail,
 } from "lucide-react";
 
 interface EquipmentDetailsProps {
@@ -294,15 +295,27 @@ export default function EquipmentDetails({ id, userRole }: EquipmentDetailsProps
           {/* Action CTAs */}
           <div className="pt-2">
             {isCustomer ? (
-              <button
-                type="button"
-                disabled={!isAvailable}
-                onClick={() => setBookingModalOpen(true)}
-                className="w-full py-3.5 px-6 rounded-xl bg-primary text-primary-foreground font-bold text-sm hover:bg-amber-700 transition-all shadow-lg shadow-amber-900/15 disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
-              >
-                <Calendar className="w-4 h-4" />
-                <span>{isAvailable ? "Book Equipment Now" : "Currently Unavailable"}</span>
-              </button>
+              <div className="flex flex-col sm:flex-row items-center gap-3">
+                <button
+                  type="button"
+                  disabled={!isAvailable}
+                  onClick={() => setBookingModalOpen(true)}
+                  className="flex-1 w-full py-3.5 px-6 rounded-xl bg-primary text-primary-foreground font-bold text-sm hover:bg-amber-700 transition-all shadow-lg shadow-amber-900/15 disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
+                >
+                  <Calendar className="w-4 h-4" />
+                  <span>{isAvailable ? "Book Equipment Now" : "Currently Unavailable"}</span>
+                </button>
+
+                <a
+                  href={`mailto:${item.ownerEmail}?subject=${encodeURIComponent(
+                    `Inquiry regarding ${item.name} on Rentara`
+                  )}`}
+                  className="w-full sm:w-auto py-3.5 px-5 rounded-xl border border-border bg-card hover:bg-muted text-foreground font-bold text-sm transition-all flex items-center justify-center gap-2 cursor-pointer shrink-0"
+                >
+                  <Mail className="w-4 h-4 text-amber-600" />
+                  <span>Contact Owner</span>
+                </a>
+              </div>
             ) : (
               <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-800 dark:text-amber-300 font-semibold text-center">
                 You are currently viewing as an {userRole.toUpperCase()}. Equipment booking and
