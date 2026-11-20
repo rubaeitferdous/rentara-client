@@ -60,3 +60,34 @@ export interface CategoryInfo {
   iconName: string;
   count?: string;
 }
+
+export interface UserRecord {
+  _id: string;
+  name: string;
+  email: string;
+  image?: string;
+  role: Role;
+  phone?: string;
+  address?: string;
+  createdAt: string;
+  roleUpdatedAt?: string;
+}
+
+export interface AdminAnalytics {
+  totalUsers: number;
+  totalEquipment: number;
+  totalBookings: number;
+  pendingApprovals: number;
+  completedRentals: number;
+  totalRevenue: number;
+  monthly: Array<{ month: string; bookings: number; revenue: number }>;
+}
+
+export interface OwnerAnalytics {
+  totalEquipment: number;
+  totalBookings: number;
+  completedRentals: number;
+  totalEarnings: number;
+  monthly: Array<{ month: string; earnings: number; bookings: number }>;
+}
+

@@ -10,7 +10,10 @@ import type { Role } from "@/types";
 export async function getSession() {
   try {
     return await auth.api.getSession({ headers: await headers() });
-  } catch (err) {
+  } catch (err: any) {
+    if (err?.digest === "DYNAMIC_SERVER_USAGE" || err?.digest?.startsWith("NEXT_")) {
+      throw err;
+    }
     console.error("Session retrieval error:", err);
     return null;
   }
