@@ -52,7 +52,9 @@ export async function api<T = any>(
   }
 
   const normalizedEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
-  const targetUrl = `${API_BASE}${normalizedEndpoint}`;
+  const targetUrl = endpoint.startsWith("http")
+    ? endpoint
+    : `${API_BASE}${normalizedEndpoint}`;
 
   const res = await fetch(targetUrl, {
     ...options,
