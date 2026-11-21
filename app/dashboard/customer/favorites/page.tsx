@@ -9,6 +9,7 @@ import { api } from "@/lib/api";
 import { useApi } from "@/hooks/useApi";
 import DataTable, { Column } from "@/components/dashboard/DataTable";
 import Loader from "@/components/Loader";
+import { formatDate } from "@/lib/utils";
 import type { Equipment } from "@/types";
 import { Heart, Trash2, ExternalLink, MapPin, Tag, Compass } from "lucide-react";
 
@@ -125,13 +126,7 @@ export default function FavoritesPage() {
       header: "Saved On",
       render: (item) => (
         <span className="text-xs text-muted-foreground whitespace-nowrap">
-          {item.favoritedAt
-            ? new Date(item.favoritedAt).toLocaleDateString("en-US", {
-                month: "short",
-                day: "numeric",
-                year: "numeric",
-              })
-            : "—"}
+          {formatDate(item.favoritedAt)}
         </span>
       ),
     },

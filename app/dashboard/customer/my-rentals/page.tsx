@@ -12,6 +12,7 @@ import StatusBadge from "@/components/dashboard/StatusBadge";
 import Pagination from "@/components/dashboard/Pagination";
 import InvoiceModal from "@/components/dashboard/InvoiceModal";
 import Loader from "@/components/Loader";
+import { formatDate, calculateRentalDays } from "@/lib/utils";
 import type { Booking, Paged } from "@/types";
 import {
   CalendarDays,
@@ -100,19 +101,9 @@ export default function MyRentalsPage() {
     {
       header: "Rental Window",
       render: (b) => {
-        const start = new Date(b.startDate).toLocaleDateString("en-US", {
-          month: "short",
-          day: "numeric",
-          year: "numeric",
-        });
-        const end = new Date(b.endDate).toLocaleDateString("en-US", {
-          month: "short",
-          day: "numeric",
-          year: "numeric",
-        });
-        const d1 = new Date(b.startDate).getTime();
-        const d2 = new Date(b.endDate).getTime();
-        const days = Math.max(1, Math.round((d2 - d1) / (1000 * 60 * 60 * 24)) + 1);
+        const start = formatDate(b.startDate);
+        const end = formatDate(b.endDate);
+        const days = calculateRentalDays(b.startDate, b.endDate);
 
         return (
           <div className="space-y-0.5">
@@ -146,11 +137,7 @@ export default function MyRentalsPage() {
       header: "Booked On",
       render: (b) => (
         <span className="text-xs text-muted-foreground whitespace-nowrap">
-          {new Date(b.createdAt).toLocaleDateString("en-US", {
-            month: "short",
-            day: "numeric",
-            year: "numeric",
-          })}
+          {formatDate(b.createdAt)}
         </span>
       ),
     },

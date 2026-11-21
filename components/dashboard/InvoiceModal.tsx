@@ -3,6 +3,7 @@
 import Image from "next/image";
 import type { Booking } from "@/types";
 import StatusBadge from "./StatusBadge";
+import { formatDate, calculateRentalDays } from "@/lib/utils";
 import { Compass, Printer, X, ShieldCheck, Calendar, MapPin, Mail, Phone } from "lucide-react";
 
 interface InvoiceModalProps {
@@ -13,24 +14,23 @@ interface InvoiceModalProps {
 export default function InvoiceModal({ booking, onClose }: InvoiceModalProps) {
   if (!booking) return null;
 
-  const start = new Date(booking.startDate).toLocaleDateString("en-US", {
+  const start = formatDate(booking.startDate, {
     month: "long",
     day: "numeric",
     year: "numeric",
   });
-  const end = new Date(booking.endDate).toLocaleDateString("en-US", {
+  const end = formatDate(booking.endDate, {
     month: "long",
     day: "numeric",
     year: "numeric",
   });
-  const bookedDate = new Date(booking.createdAt).toLocaleDateString("en-US", {
+  const bookedDate = formatDate(booking.createdAt, {
     month: "short",
     day: "numeric",
     year: "numeric",
   });
 
-  const diffTime = new Date(booking.endDate).getTime() - new Date(booking.startDate).getTime();
-  const rentalDays = Math.max(1, Math.round(diffTime / (1000 * 60 * 60 * 24)) + 1);
+  const rentalDays = calculateRentalDays(booking.startDate, booking.endDate);
 
   const handlePrint = () => {
     window.print();

@@ -8,6 +8,7 @@ import { api } from "@/lib/api";
 import { useApi } from "@/hooks/useApi";
 import DataTable, { Column } from "@/components/dashboard/DataTable";
 import Loader from "@/components/Loader";
+import { formatDate } from "@/lib/utils";
 import type { UserRecord, Role } from "@/types";
 import {
   Users,
@@ -141,13 +142,7 @@ export default function AdminUsersPage() {
       header: "Joined Date",
       render: (u) => (
         <span className="text-xs text-muted-foreground whitespace-nowrap">
-          {u.createdAt
-            ? new Date(u.createdAt).toLocaleDateString("en-US", {
-                month: "short",
-                day: "numeric",
-                year: "numeric",
-              })
-            : "—"}
+          {formatDate(u.createdAt)}
         </span>
       ),
     },

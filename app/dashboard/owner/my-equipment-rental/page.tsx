@@ -12,6 +12,7 @@ import StatusBadge from "@/components/dashboard/StatusBadge";
 import Pagination from "@/components/dashboard/Pagination";
 import InvoiceModal from "@/components/dashboard/InvoiceModal";
 import Loader from "@/components/Loader";
+import { formatDate } from "@/lib/utils";
 import type { Booking, Paged } from "@/types";
 import {
   Layers,
@@ -114,15 +115,8 @@ export default function OwnerRentalsPage() {
     {
       header: "Rental Duration",
       render: (b) => {
-        const start = new Date(b.startDate).toLocaleDateString("en-US", {
-          month: "short",
-          day: "numeric",
-        });
-        const end = new Date(b.endDate).toLocaleDateString("en-US", {
-          month: "short",
-          day: "numeric",
-          year: "numeric",
-        });
+        const start = formatDate(b.startDate, { month: "short", day: "numeric" });
+        const end = formatDate(b.endDate, { month: "short", day: "numeric", year: "numeric" });
         return (
           <div className="space-y-0.5">
             <p className="text-xs font-semibold text-foreground">
