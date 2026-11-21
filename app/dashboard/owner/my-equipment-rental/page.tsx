@@ -72,6 +72,7 @@ export default function OwnerRentalsPage() {
                 fill
                 className="object-cover"
                 sizes="44px"
+                unoptimized
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs font-bold">

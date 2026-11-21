@@ -97,7 +97,7 @@ export default function AdminEquipmentPage() {
         <div className="flex items-center gap-3">
           <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-muted border border-border shrink-0">
             {item.image ? (
-              <Image src={item.image} alt={item.name} fill className="object-cover" sizes="48px" />
+              <Image src={item.image} alt={item.name} fill className="object-cover" sizes="48px" unoptimized />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs font-bold">
                 GEAR

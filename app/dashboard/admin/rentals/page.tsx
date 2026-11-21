@@ -46,7 +46,7 @@ export default function AdminRentalsPage() {
         <div className="flex items-center gap-3">
           <div className="relative w-10 h-10 rounded-xl overflow-hidden bg-muted border border-border shrink-0">
             {b.equipmentImage ? (
-              <Image src={b.equipmentImage} alt={b.equipmentName} fill className="object-cover" sizes="40px" />
+              <Image src={b.equipmentImage} alt={b.equipmentName} fill className="object-cover" sizes="40px" unoptimized />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs font-bold">
                 GEAR

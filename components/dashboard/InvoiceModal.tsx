@@ -175,6 +175,7 @@ export default function InvoiceModal({ booking, onClose }: InvoiceModalProps) {
                               fill
                               className="object-cover"
                               sizes="32px"
+                              unoptimized
                             />
                           </div>
                         )}

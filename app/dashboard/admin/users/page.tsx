@@ -103,7 +103,7 @@ export default function AdminUsersPage() {
         <div className="flex items-center gap-3">
           <div className="relative w-10 h-10 rounded-full overflow-hidden bg-amber-500/10 text-amber-600 border border-border shrink-0 flex items-center justify-center font-bold text-xs">
             {u.image ? (
-              <Image src={u.image} alt={u.name} fill className="object-cover" sizes="40px" />
+              <Image src={u.image} alt={u.name} fill className="object-cover" sizes="40px" unoptimized />
             ) : (
               <span>{u.name?.slice(0, 2).toUpperCase() || "US"}</span>
             )}
