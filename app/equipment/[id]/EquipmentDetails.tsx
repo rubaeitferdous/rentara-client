@@ -35,21 +35,21 @@ export default function EquipmentDetails({ id, userRole }: EquipmentDetailsProps
   const [favLoading, setFavLoading] = useState(false);
   const [bookingModalOpen, setBookingModalOpen] = useState(false);
 
-  const isCustomer = userRole === "customer";
+  const canBook = userRole === "customer" || userRole === "admin";
 
   // Check initial favorite status
   useEffect(() => {
-    if (!isCustomer || !id) return;
+    if (!canBook || !id) return;
 
     api<{ favorited: boolean }>(`/favorites/check/${id}`)
       .then((res) => setIsFavorited(Boolean(res.favorited)))
       .catch((err) => console.warn("Favorite check error:", err.message));
-  }, [id, isCustomer]);
+  }, [id, canBook]);
 
   // Handle favorite toggle
   const handleToggleFavorite = async () => {
-    if (!isCustomer) {
-      toast.error("Only customer accounts can save items to favorites.");
+    if (!canBook) {
+      toast.error("Only customer or administrator accounts can save items to favorites.");
       return;
     }
 
@@ -193,7 +193,7 @@ export default function EquipmentDetails({ id, userRole }: EquipmentDetailsProps
                 )}
               </span>
 
-              {isCustomer && (
+              {canBook && (
                 <button
                   type="button"
                   onClick={handleToggleFavorite}
@@ -294,7 +294,7 @@ export default function EquipmentDetails({ id, userRole }: EquipmentDetailsProps
 
           {/* Action CTAs */}
           <div className="pt-2">
-            {isCustomer ? (
+            {canBook ? (
               <div className="flex flex-col sm:flex-row items-center gap-3">
                 <button
                   type="button"
@@ -319,7 +319,7 @@ export default function EquipmentDetails({ id, userRole }: EquipmentDetailsProps
             ) : (
               <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-800 dark:text-amber-300 font-semibold text-center">
                 You are currently viewing as an {userRole.toUpperCase()}. Equipment booking and
-                favorites are available to Customer accounts.
+                favorites are available to Customer and Administrator accounts.
               </div>
             )}
           </div>
