@@ -24,10 +24,13 @@ export async function getSession() {
  * Redirects to /login if there is no active authenticated session.
  * Prevents client-side hydration flickers or logout flash on page reload.
  */
-export async function requireUser() {
+export async function requireUser(callbackUrl?: string) {
   const session = await getSession();
   if (!session?.user) {
-    redirect("/login");
+    const target = callbackUrl
+      ? `/login?callbackUrl=${encodeURIComponent(callbackUrl)}`
+      : "/login";
+    redirect(target);
   }
   return session;
 }
@@ -36,8 +39,8 @@ export async function requireUser() {
  * Server Component Role Guard:
  * Enforces role permissions (customer, owner, admin).
  */
-export async function requireRole(allowedRole: Role | Role[]) {
-  const session = await requireUser();
+export async function requireRole(allowedRole: Role | Role[], callbackUrl?: string) {
+  const session = await requireUser(callbackUrl);
   const userRole = (session.user as { role?: string }).role || "customer";
 
   const isAllowed = Array.isArray(allowedRole)

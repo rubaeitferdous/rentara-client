@@ -12,14 +12,19 @@ interface EquipmentCardProps {
 
 export default function EquipmentCard({ item }: EquipmentCardProps) {
   const router = useRouter();
-  const { data: session } = useSession();
+  const { data: session, isPending } = useSession();
   const isAvailable = item.availableQuantity > 0;
 
-  const handleViewDetails = () => {
-    if (!session?.user) {
-      router.push(`/login?callbackUrl=/equipment/${item._id}`);
-    } else {
-      router.push(`/equipment/${item._id}`);
+  const targetUrl =
+    !isPending && !session?.user
+      ? `/login?callbackUrl=/equipment/${item._id}`
+      : `/equipment/${item._id}`;
+
+  const handleViewDetails = (e: React.MouseEvent) => {
+    // Only redirect to login if session lookup is complete and user is confirmed not logged in
+    if (!isPending && !session?.user) {
+      e.preventDefault();
+      router.push(targetUrl);
     }
   };
 
@@ -112,14 +117,14 @@ export default function EquipmentCard({ item }: EquipmentCardProps) {
             </div>
           </div>
 
-          <button
-            type="button"
+          <Link
+            href={targetUrl}
             onClick={handleViewDetails}
             className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-semibold hover:bg-amber-700 transition-colors cursor-pointer shadow-sm group-hover:shadow-md"
           >
             <span>View Details</span>
             <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-          </button>
+          </Link>
         </div>
       </div>
     </div>

@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import Swal from "sweetalert2";
-import { signUp, signIn } from "@/lib/auth-client";
+import { signUp, signIn, useSession } from "@/lib/auth-client";
 import { clearTokenCache } from "@/lib/api";
 import { uploadImage } from "@/lib/imgbb";
 import {
@@ -23,6 +23,8 @@ import {
 
 export default function RegisterPage() {
   const router = useRouter();
+  const { data: session, isPending: sessionPending } = useSession();
+
   const [loading, setLoading] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [photoUrl, setPhotoUrl] = useState("");
@@ -30,6 +32,12 @@ export default function RegisterPage() {
   const [previewUrl, setPreviewUrl] = useState<string>("");
 
   const [password, setPassword] = useState("");
+
+  useEffect(() => {
+    if (!sessionPending && session?.user) {
+      router.replace("/");
+    }
+  }, [session, sessionPending, router]);
 
   // Real-time password validation helpers
   const hasMinLength = password.length >= 6;

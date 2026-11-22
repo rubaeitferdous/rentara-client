@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import Swal from "sweetalert2";
-import { signIn } from "@/lib/auth-client";
+import { signIn, useSession } from "@/lib/auth-client";
 import { clearTokenCache } from "@/lib/api";
 import {
   Compass,
@@ -19,10 +19,18 @@ export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/";
+  const { data: session, isPending: sessionPending } = useSession();
 
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  // Automatically redirect away if user is already authenticated
+  useEffect(() => {
+    if (!sessionPending && session?.user) {
+      router.replace(callbackUrl);
+    }
+  }, [session, sessionPending, callbackUrl, router]);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
