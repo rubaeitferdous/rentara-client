@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Compass, Mail, MapPin, Phone, ShieldCheck, Heart } from "lucide-react";
+import { Compass, Mail, MapPin, Phone, ShieldCheck } from "lucide-react";
 
 export default function Footer() {
   return (
@@ -218,7 +218,15 @@ export default function Footer() {
         <div className="mt-12 pt-8 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
           <p>© {new Date().getFullYear()} Rentara Equipment Rental Platform. All rights reserved.</p>
           <p className="flex items-center gap-1">
-            Engineered with <Heart className="w-3.5 h-3.5 text-red-500 fill-red-500 inline" /> for Assignment 9 (Category 003).
+            <span>Engineered by</span>
+            <a
+              href="https://github.com/rubaeitferdous"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-amber-600 dark:text-amber-400 hover:underline transition-colors"
+            >
+              Rubaeit Ferdous
+            </a>
           </p>
         </div>
       </div>
