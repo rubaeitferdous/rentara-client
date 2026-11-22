@@ -27,6 +27,7 @@ if (process.env.NODE_ENV !== "production") {
 const db = client.db(process.env.MONGODB_DB || "rentara_db");
 
 export const auth = betterAuth({
+  baseURL: process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_APP_URL,
   database: mongodbAdapter(db, { client }),
   emailAndPassword: {
     enabled: true,
