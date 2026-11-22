@@ -23,18 +23,6 @@
 
 ---
 
-## 🔑 Submission & Evaluation Credentials
-
-To test and review the role-based features across the platform, use the following pre-configured credentials:
-
-| Role | Email | Password | Access Capabilities |
-| :--- | :--- | :--- | :--- |
-| **Administrator** | `admin@rentara.com` | `AdminPassword123` | Full Admin Console, User Role Governance, Catalog Moderation (Approve/Reject), Platform Turnover Analytics, Global Rental Ledger |
-| **Equipment Owner** | `owner@rentara.com` | `OwnerPassword123` | Add & Edit Equipment (ImgBB integration), My Fleet Inventory Management, Incoming Rental Order Fulfillment, Monthly Revenue Analytics |
-| **Customer / Renter**| `customer@rentara.com`| `CustomerPassword123`| Public Catalog Browsing, Equipment Booking & Availability Check, Stripe Escrow Checkout, Saved Favorites Wishlist, Rental Receipts |
-
----
-
 ## 🌟 Key Architecture & Features
 
 ### 1. Bespoke Warm Luxury Aesthetic & Responsive Design
