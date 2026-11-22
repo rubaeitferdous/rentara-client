@@ -10,9 +10,9 @@ export async function GET() {
       return NextResponse.json({ message: "Unauthorized: No active session" }, { status: 401 });
     }
 
-    const secret = process.env.JWT_SECRET;
+    const secret = process.env.JWT_SECRET || process.env.BETTER_AUTH_SECRET;
     if (!secret) {
-      console.error("JWT_SECRET is missing in environment variables");
+      console.error("JWT_SECRET or BETTER_AUTH_SECRET is missing in environment variables");
       return NextResponse.json({ message: "Server configuration error" }, { status: 500 });
     }
 

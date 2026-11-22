@@ -47,6 +47,7 @@ const getBaseUrl = () => {
 
 export const auth = betterAuth({
   baseURL: getBaseUrl(),
+  secret: process.env.BETTER_AUTH_SECRET,
   trustedOrigins: [
     "https://rentara-client.vercel.app",
     "http://localhost:3000",

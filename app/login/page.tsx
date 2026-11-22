@@ -74,10 +74,13 @@ export default function LoginPage() {
 
   const handleGoogleSignIn = async () => {
     try {
-      await signIn.social({
+      const res = await signIn.social({
         provider: "google",
         callbackURL: callbackUrl,
       });
+      if (res?.error) {
+        toast.error(res.error.message || "Failed to connect with Google.");
+      }
     } catch (err: any) {
       console.error("Google login error:", err);
       toast.error("Failed to connect with Google.");
