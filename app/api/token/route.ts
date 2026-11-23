@@ -10,10 +10,11 @@ export async function GET() {
       return NextResponse.json({ message: "Unauthorized: No active session" }, { status: 401 });
     }
 
-    const secret =
-      process.env.JWT_SECRET ||
-      process.env.BETTER_AUTH_SECRET ||
-      "rentara-production-betterauth-secret-key-32chars";
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      console.error("JWT_SECRET is missing in environment variables");
+      return NextResponse.json({ message: "Server configuration error" }, { status: 500 });
+    }
 
     const role = (session.user as { role?: string }).role || "customer";
 

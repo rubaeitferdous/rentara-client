@@ -125,13 +125,10 @@ export default function RegisterPage() {
 
   const handleGoogleSignIn = async () => {
     try {
-      const res = await signIn.social({
+      await signIn.social({
         provider: "google",
         callbackURL: "/",
       });
-      if (res?.error) {
-        toast.error(res.error.message || "Failed to connect with Google.");
-      }
     } catch (err: any) {
       console.error("Google sign in error:", err);
       toast.error("Failed to connect with Google.");

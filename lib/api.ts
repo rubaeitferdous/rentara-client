@@ -1,14 +1,4 @@
-const getApiBase = () => {
-  if (process.env.NEXT_PUBLIC_API_URL && !process.env.NEXT_PUBLIC_API_URL.includes("localhost")) {
-    return process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, "");
-  }
-  if (typeof window !== "undefined" && window.location.hostname.includes("vercel.app")) {
-    return "https://rentara-server.vercel.app";
-  }
-  return (process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000").replace(/\/$/, "");
-};
-
-const API_BASE = getApiBase();
+const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000").replace(/\/$/, "");
 
 let cachedToken: { token: string; exp: number } | null = null;
 

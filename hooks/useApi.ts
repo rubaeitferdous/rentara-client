@@ -10,11 +10,10 @@ interface UseApiOptions {
 
 export function useApi<T = any>(
   endpoint: string | null,
-  options: UseApiOptions = {}
+  options: UseApiOptions = { requiresAuth: true, immediate: true }
 ) {
-  const { requiresAuth = true, immediate = true } = options;
   const [data, setData] = useState<T | null>(null);
-  const [loading, setLoading] = useState<boolean>(Boolean(immediate && endpoint));
+  const [loading, setLoading] = useState<boolean>(Boolean(options.immediate && endpoint));
   const [error, setError] = useState<string>("");
 
   const fetchData = useCallback(async () => {
@@ -22,7 +21,7 @@ export function useApi<T = any>(
 
     setLoading(true);
     try {
-      const result = await api<T>(endpoint, {}, requiresAuth);
+      const result = await api<T>(endpoint, {}, options.requiresAuth);
       setData(result);
       setError("");
     } catch (err: any) {
@@ -30,13 +29,13 @@ export function useApi<T = any>(
     } finally {
       setLoading(false);
     }
-  }, [endpoint, requiresAuth]);
+  }, [endpoint, options.requiresAuth]);
 
   useEffect(() => {
-    if (immediate && endpoint) {
+    if (options.immediate && endpoint) {
       fetchData();
     }
-  }, [fetchData, immediate, endpoint]);
+  }, [fetchData, options.immediate, endpoint]);
 
   return {
     data,
