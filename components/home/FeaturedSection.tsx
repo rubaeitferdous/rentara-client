@@ -10,7 +10,7 @@ import { ArrowRight, Sparkles } from "lucide-react";
 export default function FeaturedSection() {
   const { data: items, loading, error } = useApi<Equipment[]>(
     "/equipment/featured",
-    { requiresAuth: false }
+    { requiresAuth: false, immediate: true }
   );
 
   return (
